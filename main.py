@@ -10,7 +10,7 @@
 
 
 import base64
-from requests import post, get
+from requests import post, get, post
 import json
 
 
@@ -79,8 +79,21 @@ def get_artist_top_tracks(token, artist_ids):
     return tracks
 
 
+# It's creating the playlist under my account. 
+# I'm not sure how to create for a different user yet (how to log them in)
 def create_playlist(token, tracks):
-    pass
+    header = get_auth_header(token)
+    user_id = "aimsvln" # My user id. The idea is users will log in (authenticate through spotify) and grab their id.
+    
+    url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
+    data = { "name": "Your mix!", "description": "Mix", "public":True}
+    response = post(url, headers=header, json=data)
+    
+    if response.status_code == 201:
+        print("created sucessful")
+    else:
+        print("failed to create. stat code: " + str(response.status_code))
+        
         
 
 def main():
