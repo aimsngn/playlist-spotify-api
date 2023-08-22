@@ -1,16 +1,32 @@
+### Learning notes:
+### url = endpoints found within the spotify API website --> different per request
+### the requests retrieves the data in json format --> needs to be parsed (json.loads())
+
+
+### To learn and explore:
+### How to put this on web?? how to make credentials secret??
+### How can i make it so i can also grab users' top listening so I can add it in??
+### Does this require user authorization???
+
+
 import base64
 from requests import post, get
 import json
 
+
+# These are the client ids of the app for the Spotify API
 client_id = "0344808376044123b52d771e92858c83"
 client_secret = "c358e0a6e90d480cacbc745fddc15cf7"
 
+
+# This grabs the token for those credentials
+# Please don't publish this information online, my account will be compromised
 def get_token():
     auth_string = client_id + ":" + client_secret
     auth_bytes = auth_string.encode("utf-8")
     auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
     
-    url = 'https://accounts.spotify.com/api/token' #endpoint
+    url = 'https://accounts.spotify.com/api/token' 
     headers = {
         "Authorization": "Basic " +auth_base64,
         "Content-Type": "application/x-www-form-urlencoded"
@@ -22,10 +38,14 @@ def get_token():
     
     return token
 
+
+# The header for all requests (get, post, etc)
 def get_auth_header(token):
     return {"Authorization": "Bearer " + token}
 
 
+# Searches and grabs artists' ids
+# This will be used to grab their top tracks
 def search_artist(token, artist_names):
     artist_ids = []
     url = "https://api.spotify.com/v1/search"
@@ -41,6 +61,9 @@ def search_artist(token, artist_names):
     
     return artist_ids
 
+
+# This grabs the artists' top tracks
+# These tracks will be used for playlist creation
 def get_artist_top_tracks(token, artist_ids):
     tracks = []
     header = get_auth_header(token)
@@ -53,10 +76,18 @@ def get_artist_top_tracks(token, artist_ids):
         for track in json_result:
             tracks.append(track["id"])
         
+    return tracks
+
+
+def create_playlist(token, tracks):
+    pass
+        
 
 def main():
     token = get_token()
     artist_ids = search_artist(token, ["Lola Amour", "Casey Lowry"])
-    get_artist_top_tracks(token, artist_ids)
+    tracks = get_artist_top_tracks(token, artist_ids)
+    create_playlist(token, tracks)
+    
 
 main()
