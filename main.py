@@ -25,33 +25,26 @@ def get_token():
 def get_auth_header(token):
     return {"Authorization": "Bearer " + token}
 
-def get_artist_followers(token):
-    artist_id = "29zSTMejPhY0m7kwNQ9SPI"
-    url = "https://api.spotify.com/v1/artists/{}".format(artist_id)
-    data = {"followers": "total"}
-    response = get(url, get_auth_header(token), data=data)
 
-    if response.status_code == 200:
-        followers_result = json.loads(followers_result.content)
-        followers = followers_result["artist"]["followers"]["total"]
-    else:
-        print(response.status_code)
-        return "eror"
-    
-    return str(followers)
-
-def search_artist(token, artist_name):
+def search_artist(token, artist_names):
+    artist_ids = []
     url = "https://api.spotify.com/v1/search"
     header = get_auth_header(token)
-    query = f"q={artist_name}&type=artist&limit=1"
-    query_url = url + "?" + query
     
-    result = get(query_url, headers=header)
-    json_result = json.loads(result.content)["artists"]["items"]
+    for artist_name in artist_names:
+        query = f"q={artist_name}&type=artist&limit=1"
+        query_url = url + "?" + query
     
-    print(json_result[0]["followers"]["total"])
+        result = get(query_url, headers=header)
+        json_result = json.loads(result.content)["artists"]["items"]
+        artist_ids.append(json_result[0]["id"])
+    
+    return artist_ids
+
+def get_artist_top_tracks(token, artist_ids):
+    
 
 token = get_token()
-#print(get_artist_followers(token))
-search_artist(token, "Lola Amour")
+artist_ids = search_artist(token, ["Lola Amour", "Casey Lowry"])
+get_artist_top_tracks(token, artist_ids)
 
