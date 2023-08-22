@@ -1,106 +1,40 @@
-### Learning notes:
-### url = endpoints found within the spotify API website --> different per request
-### the requests retrieves the data in json format --> needs to be parsed (json.loads())
-
-
-### To learn and explore:
-### How to put this on web?? how to make credentials secret??
-### How can i make it so i can also grab users' top listening so I can add it in??
-### Does this require user authorization???
-
-
 import base64
 from requests import post, get, post
 import json
-
+from flask import Flask, request, url_for, session, redirect #will be used for redirect_uri; esssentially where our "app" is hosted
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials
+import string
+import random
 
 # These are the client ids of the app for the Spotify API
 client_id = "0344808376044123b52d771e92858c83"
 client_secret = "c358e0a6e90d480cacbc745fddc15cf7"
+redirct_uri = "http://127.0.0.1:5000/"
 
+app = Flask(__name__)
+app.secret_key = "oijdwaoidjwaiojdai"
+app.config['SESSION_COOKIE_NAME'] = 'COOKIE'
 
-# This grabs the token for those credentials
-# Please don't publish this information online, my account will be compromised
-def get_token():
-    auth_string = client_id + ":" + client_secret
-    auth_bytes = auth_string.encode("utf-8")
-    auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
+@app.route('/')
+def index():
+    return "home"
+
+@app.route('/Tracks')
+def getTracks():
+    return "tracks"
+
+@app.route('/login')
+def login():
+    scope = "playlist-modify-public"
+    state = generate_random_string(16)
+    auth_url = ('https://accounts.spotify.com/authorize?'f'response_type=code&client_id={client_id}&'f'scope={scope}&redirect_uri={redirct_uri}&'f'state={state}')
     
-    url = 'https://accounts.spotify.com/api/token' 
-    headers = {
-        "Authorization": "Basic " +auth_base64,
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    data = {"grant_type": "client_credentials"}
-    result = post(url,headers=headers,data=data )
-    json_result = json.loads(result.content)
-    token = json_result["access_token"]
+    return redirect(auth_url)
+
+def generate_random_string(length):
+    letters = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters) for _ in range(length))
     
-    return token
+app.run()
 
-
-# The header for all requests (get, post, etc)
-def get_auth_header(token):
-    return {"Authorization": "Bearer " + token}
-
-
-# Searches and grabs artists' ids
-# This will be used to grab their top tracks
-def search_artist(token, artist_names):
-    artist_ids = []
-    url = "https://api.spotify.com/v1/search"
-    header = get_auth_header(token)
-    
-    for artist_name in artist_names:
-        query = f"q={artist_name}&type=artist&limit=1"
-        query_url = url + "?" + query
-    
-        result = get(query_url, headers=header)
-        json_result = json.loads(result.content)["artists"]["items"]
-        artist_ids.append(json_result[0]["id"])
-    
-    return artist_ids
-
-
-# This grabs the artists' top tracks
-# These tracks will be used for playlist creation
-def get_artist_top_tracks(token, artist_ids):
-    tracks = []
-    header = get_auth_header(token)
-
-    for artist_id in artist_ids:
-        url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks?market=US"
-        result = get(url, headers=header)
-        json_result = json.loads(result.content)["tracks"]
-        
-        for track in json_result:
-            tracks.append(track["id"])
-        
-    return tracks
-
-
-# It's creating the playlist under my account. 
-# I'm not sure how to create for a different user yet (how to log them in)
-def create_playlist(token, tracks):
-    header = get_auth_header(token)
-    user_id = "aimsvln" # My user id. The idea is users will log in (authenticate through spotify) and grab their id.
-    
-    url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
-    data = { "name": "Your mix!", "description": "Mix", "public":True}
-    response = post(url, headers=header, json=data)
-    
-    if response.status_code == 201:
-        print("created sucessful")
-    else:
-        print("failed to create. stat code: " + str(response.status_code))
-        
-        
-
-def main():
-    token = get_token()
-    artist_ids = search_artist(token, ["Lola Amour", "Casey Lowry"])
-    tracks = get_artist_top_tracks(token, artist_ids)
-    create_playlist(token, tracks)
-    
-
-main()
