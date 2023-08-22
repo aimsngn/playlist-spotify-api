@@ -42,9 +42,21 @@ def search_artist(token, artist_names):
     return artist_ids
 
 def get_artist_top_tracks(token, artist_ids):
-    
+    tracks = []
+    header = get_auth_header(token)
 
-token = get_token()
-artist_ids = search_artist(token, ["Lola Amour", "Casey Lowry"])
-get_artist_top_tracks(token, artist_ids)
+    for artist_id in artist_ids:
+        url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks?market=US"
+        result = get(url, headers=header)
+        json_result = json.loads(result.content)["tracks"]
+        
+        for track in json_result:
+            tracks.append(track["id"])
+        
 
+def main():
+    token = get_token()
+    artist_ids = search_artist(token, ["Lola Amour", "Casey Lowry"])
+    get_artist_top_tracks(token, artist_ids)
+
+main()
