@@ -1,16 +1,7 @@
-# Define two lists
-list1 = [1, 2, 3]
-list2 = [4, 5, 6]
+import random
 
-# Merge the lists using the + operator
-merged_list = list1 + list2
+my_list = ["apple", "bees", "banana", "apple", "bees", "banana", "apple", "bees", "banana"]
+random.shuffle(my_list)
+print(my_list[:5])
 
-print(merged_list)
-# Define two lists
-list1 = [1, 2, 3]
-list2 = [4, 5, 6]
 
-# Extend list1 with the elements of list2
-list1.extend(list2)
-
-print(list1)
