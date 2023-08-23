@@ -3,8 +3,6 @@ import requests
 from requests import post, get
 import json
 from flask import Flask, request, url_for, session, redirect #will be used for redirect_uri; esssentially where our "app" is hosted
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials
 import string
 import random
 
@@ -52,7 +50,7 @@ def handle_redirect():
             "Content-Type": "application/x-www-form-urlencoded"
         }
         
-        response = requests.post(url, headers=header,data=data)
+        response = post(url, headers=header,data=data)
         
         if response.status_code == 200:
             json_result = json.loads(response.content)
@@ -85,9 +83,9 @@ def createPlaylist():
     response_code = addTracks(playlist_id)
     
     if response_code == 201:
-        return "success added tracks: " + playlist_url
-    
-    return redirect(url_for('start_login'), _external= True)
+        return redirect(playlist_url)
+
+    return str(response_code)
     
     
 
@@ -117,7 +115,9 @@ def getUser():
 def getTracks():
     token = get_token() #checks if expired or nah
     header = get_auth_header(token)
-    artist_ids = search_artist(header, artist_names=["Lola Amour", "Casey Lowry", "AJR"])
+    
+    #limit it to 3 max
+    artist_ids = search_artist(header, artist_names=["Olivia Rodrigo", "Taylor Swift"])
     tracks = []
     
     for artist_id in artist_ids:
@@ -125,10 +125,24 @@ def getTracks():
         result = get(url, headers=header)
         json_result = json.loads(result.content)["tracks"]
         
+        count_added_track = 0
         for track in json_result:
+            
+            if count_added_track >= 5:
+                break
+            
             tracks.append(track["uri"])
-        
+            count_added_track +=1
+    
+    # merge user recommendations into tracks
+    
+    random.shuffle(tracks)
     return tracks
+
+#get five recommendations --> add it to the playlist
+# need seed artists (to capture their style); make sure genres aint seen yet) & seed tracks (random)
+
+
 
 
 def search_artist(header, artist_names):
@@ -181,7 +195,7 @@ def refresh_token():
             "Content-Type": "application/x-www-form-urlencoded"
         }
         
-        response = requests.post(url, headers=header, data=data)
+        response = requests.post(url, headers=header, json=data)
         
         if response.status_code == 200:
             json_result = json.loads(response.content)
