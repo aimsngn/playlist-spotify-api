@@ -126,16 +126,16 @@ def getTracks():
             
             count_added_track +=1
     
-    random.shuffle(tracks_id)
-    recommended_tracks_uri = getRecommendedTracks(tracks_id[:5], artist_ids)
+    #random.shuffle(tracks_id)
+    #recommended_tracks_uri = getRecommendedTracks(tracks_id[:5], artist_ids)
     
-    tracks_uri.extend(recommended_tracks_uri)
+    #tracks_uri.extend(recommended_tracks_uri)
     
     # merge user recommendations into tracks
     random.shuffle(tracks_uri)
     return tracks_uri
 
-def getRecommendedTracks(seed_tracks,seed_artists):
+#def getRecommendedTracks(seed_tracks,seed_artists):
     token = get_token() #checks if expired or nah
     header = get_auth_header(token)
     url = f"https://api.spotify.com/v1/recommendations?limit=5&seed_artists={seed_tracks}&seed_artists={seed_artists}"
