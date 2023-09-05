@@ -101,24 +101,14 @@ def addTracks(playlist_id):
     return response.status_code
     
     
-def getUser():
-    token = get_token() #checks if expired or nah
-    header = get_auth_header(token)
-    url = "https://api.spotify.com/v1/me"
-    
-    result = get(url, headers=header)
-    json_result = json.loads(result.content)
-    user_id = json_result["id"]
-    return user_id
-    
-
 def getTracks():
     token = get_token() #checks if expired or nah
     header = get_auth_header(token)
     
     #limit it to 3 max
     artist_ids = search_artist(header, artist_names=["Olivia Rodrigo", "Taylor Swift"])
-    tracks = []
+    tracks_uri = []
+    tracks_id = []
     
     for artist_id in artist_ids:
         url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks?market=US"
@@ -131,19 +121,50 @@ def getTracks():
             if count_added_track >= 5:
                 break
             
-            tracks.append(track["uri"])
+            tracks_uri.append(track["uri"])
+            tracks_id.append(track["id"])
+            
             count_added_track +=1
     
-    # merge user recommendations into tracks
+    #random.shuffle(tracks_id)
+    #recommended_tracks_uri = getRecommendedTracks(tracks_id[:5], artist_ids)
     
-    random.shuffle(tracks)
-    return tracks
+    #tracks_uri.extend(recommended_tracks_uri)
+    
+    # merge user recommendations into tracks
+    random.shuffle(tracks_uri)
+    return tracks_uri
+
+#def getRecommendedTracks(seed_tracks,seed_artists):
+    token = get_token() #checks if expired or nah
+    header = get_auth_header(token)
+    url = f"https://api.spotify.com/v1/recommendations?limit=5&seed_artists={seed_tracks}&seed_artists={seed_artists}"
+    recommended_tracks_uri = []
+    
+    result = get(url, headers=header)
+    json_result = json.loads(result.content)
+    
+    tracks_data = json_result["tracks"]
+    
+    for recommended_track in tracks_data:
+        recommended_tracks_uri.append(recommended_track["uri"])
+        
+    return recommended_tracks_uri
+
+
+def getUser():
+    token = get_token() #checks if expired or nah
+    header = get_auth_header(token)
+    url = "https://api.spotify.com/v1/me"
+    
+    result = get(url, headers=header)
+    json_result = json.loads(result.content)
+    user_id = json_result["id"]
+    return user_id
+    
 
 #get five recommendations --> add it to the playlist
 # need seed artists (to capture their style); make sure genres aint seen yet) & seed tracks (random)
-
-
-
 
 def search_artist(header, artist_names):
     artist_ids = []
