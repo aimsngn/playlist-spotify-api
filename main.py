@@ -70,7 +70,7 @@ def createPlaylist():
     header = get_auth_header(token)
     
     user_id = getUser()
-    data = {"name": "Your Mixed Playlist!!", "description": "enjoy your combined playlists <3", "public": True}
+    data = {"name": "Your Mixed Playlist!!", "description": "~~enjoy your combined playlists <3~~", "public": True}
  
     # creating the playlist
     url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
@@ -105,7 +105,6 @@ def getTracks():
     token = get_token() #checks if expired or nah
     header = get_auth_header(token)
     
-    #limit it to 3 max
     artist_ids = search_artist(header, artist_names=["One Direction", "Taylor Swift"]) 
     tracks_uri = []
     tracks_id = []
@@ -126,11 +125,10 @@ def getTracks():
             
             count_added_track +=1
     
-    print(json_result)
-    
     random.shuffle(tracks_id)
     #SEED TRACKS ARE JUST IDs
-    recommended_tracks_uri = getRecommendedTracks(tracks_id[:1], artist_ids) 
+    
+    getRecommendedTracks(tracks_id[:1], artist_ids) 
     
     #tracks_uri.extend(recommended_tracks_uri)
     # merge user recommendations into tracks
@@ -146,23 +144,22 @@ def getRecommendedTracks(seed_tracks,seed_artists):
     seed_tracks_str = "%".join(seed_tracks)
     seed_artists_str = "%".join(seed_artists)
     
-    url = f"https://api.spotify.com/v1/recommendations?limit=5&market=US&seed_artists={seed_artists_str}&seed_tracks={seed_tracks_str}"
+    url = f"https://api.spotify.com/v1/recommendations?limit=5&market=US&seed_artists={seed_artists_str}&seed_tracks={seed_tracks}"
+    
+    #url = f"https://api.spotify.com/v1/recommendations?limit=5&market=US&seed_artists=4AK6F7OLvEQ5QYCBNiQWHq%2C06HL4z0CvFAxyc27GXpf02&seed_tracks=1p80LdxRV74UKvL8gnD7ky"
     recommended_tracks_uri = []
     
     result = get(url, headers=header)
     json_result = json.loads(result.content)
     
     #IT ONLY TAKES 5 SEEDS IN TOTAL!!!!!
-    print("this is for reco| seed tracks: ", seed_tracks_str, "| seed artists: ", seed_artists_str, "| result: ", json_result['tracks'], "| url: ", url)
+    print("this is for reco| seed tracks: ", seed_tracks_str, "| seed artists: ", seed_artists_str, "| result: ", json_result, "| url: ", url)
     
-    tracks_data = json_result["tracks"]
-    
-    for track in tracks_data:
-       reco_track_uri = track['uri']
-       recommended_tracks_uri.append(reco_track_uri)
+    #for track in json_result:
+      # reco_track_uri = track['uri']
+       #recommended_tracks_uri.append(reco_track_uri)
         
-    print(recommended_tracks_uri)
-    return []
+    #print(recommended_tracks_uri)
 
 
 def getUser():
@@ -175,10 +172,6 @@ def getUser():
     user_id = json_result["id"]
     return user_id
     
-
-#get five recommendations --> add it to the playlist
-# need seed artists (to capture their style); make sure genres aint seen yet) & seed tracks (random)
-
 def search_artist(header, artist_names):
     artist_ids = []
     url = "https://api.spotify.com/v1/search"
