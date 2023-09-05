@@ -106,7 +106,7 @@ def getTracks():
     header = get_auth_header(token)
     
     #limit it to 3 max
-    artist_ids = search_artist(header, artist_names=["Olivia Rodrigo", "Taylor Swift"]) #this has to be a hard limit of 3 due to the seeds
+    artist_ids = search_artist(header, artist_names=["One Direction", "Taylor Swift"]) 
     tracks_uri = []
     tracks_id = []
     
@@ -126,15 +126,16 @@ def getTracks():
             
             count_added_track +=1
     
+    print(json_result)
+    
     random.shuffle(tracks_id)
     #SEED TRACKS ARE JUST IDs
-    recommended_tracks_uri = getRecommendedTracks(tracks_id[:2], artist_ids) 
+    recommended_tracks_uri = getRecommendedTracks(tracks_id[:1], artist_ids) 
     
-    tracks_uri.extend(recommended_tracks_uri)
+    #tracks_uri.extend(recommended_tracks_uri)
     # merge user recommendations into tracks
-    random.shuffle(tracks_uri)
+    #random.shuffle(tracks_uri)
     
-    print("total tracks_uris: ", tracks_uri)
     return tracks_uri
 
 def getRecommendedTracks(seed_tracks,seed_artists):
@@ -145,22 +146,23 @@ def getRecommendedTracks(seed_tracks,seed_artists):
     seed_tracks_str = "%".join(seed_tracks)
     seed_artists_str = "%".join(seed_artists)
     
-    url = f"https://api.spotify.com/v1/recommendations?seed_artists={seed_artists_str}&seed_tracks={seed_tracks_str}"
+    url = f"https://api.spotify.com/v1/recommendations?limit=5&market=US&seed_artists={seed_artists_str}&seed_tracks={seed_tracks_str}"
     recommended_tracks_uri = []
     
     result = get(url, headers=header)
     json_result = json.loads(result.content)
     
     #IT ONLY TAKES 5 SEEDS IN TOTAL!!!!!
-    print("this is for reco| seed tracks: ", seed_tracks_str, "| seed artists: ", seed_artists_str, "| result: ", json_result)
+    print("this is for reco| seed tracks: ", seed_tracks_str, "| seed artists: ", seed_artists_str, "| result: ", json_result['tracks'], "| url: ", url)
     
     tracks_data = json_result["tracks"]
     
     for track in tracks_data:
-       reco_track_uri = track[0]['uri']
+       reco_track_uri = track['uri']
        recommended_tracks_uri.append(reco_track_uri)
         
-    return recommended_tracks_uri
+    print(recommended_tracks_uri)
+    return []
 
 
 def getUser():
