@@ -126,28 +126,37 @@ def getTracks():
             
             count_added_track +=1
     
-    #random.shuffle(tracks_id)
-    #recommended_tracks_uri = getRecommendedTracks(tracks_id[:5], artist_ids)
+    random.shuffle(tracks_id)
+    #SEED TRACKS ARE JUST IDs
+    recommended_tracks_uri = getRecommendedTracks(tracks_id[:5], artist_ids) 
     
-    #tracks_uri.extend(recommended_tracks_uri)
-    
+    tracks_uri.extend(recommended_tracks_uri)
     # merge user recommendations into tracks
     random.shuffle(tracks_uri)
     return tracks_uri
 
-#def getRecommendedTracks(seed_tracks,seed_artists):
+def getRecommendedTracks(seed_tracks,seed_artists):
     token = get_token() #checks if expired or nah
     header = get_auth_header(token)
-    url = f"https://api.spotify.com/v1/recommendations?limit=5&seed_artists={seed_tracks}&seed_artists={seed_artists}"
+    
+    # Convert seed tracks and seed artists into URL-encoded strings
+    seed_tracks_str = ",".join(seed_tracks)
+    seed_artists_str = ",".join(seed_artists)
+    
+    url = f"https://api.spotify.com/v1/recommendations?limit=5&seed_artists={seed_artists_str}&seed_tracks={seed_tracks_str}"
     recommended_tracks_uri = []
     
     result = get(url, headers=header)
     json_result = json.loads(result.content)
     
-    tracks_data = json_result["tracks"]
+    #IT ONLY TAKES 5 SEEDS IN TOTAL!!!!!
+    print("this is for reco| seed tracks: ", seed_tracks_str, "| seed artists: ", seed_artists_str, "| result: ", json_result)
     
-    for recommended_track in tracks_data:
-        recommended_tracks_uri.append(recommended_track["uri"])
+    #tracks_data = json_result["tracks"]
+    
+    #for track in tracks_data:
+       ## reco_track_uri = track[0]['uri']
+       # recommended_tracks_uri.append(reco_track_uri)
         
     return recommended_tracks_uri
 
