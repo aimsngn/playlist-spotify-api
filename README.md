@@ -1,5 +1,4 @@
 # playlist-spotify-api
-##Description:
 This repository is dedicated to experimenting and exploring the functionalities of Spotify's API.
 
 ## Branches
