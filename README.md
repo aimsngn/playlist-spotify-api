@@ -5,6 +5,7 @@ This repository is dedicated to experimenting and exploring the functionalities 
   -  main: This branch contains the working updated code of the entire application, including both server and client sides.
   - master-back: This branch focuses on the server-side code.
   - master-front: The master-front branch is designated for client-side code. Feel free to push **WORKING** commits directly into this branch. 
+    - Remember to PULL CHANGES
     - For experimental features, please create your OWN local branches.
 
 ## Modules Required
