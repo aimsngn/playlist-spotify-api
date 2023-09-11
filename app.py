@@ -23,10 +23,11 @@ app.config['SESSION_COOKIE_NAME'] = 'COOKIE'
 @app.route('/') 
 def start_login():
     # Establishes scope and client
-    scope = "playlist-modify-public playlist-modify-private" # The scope request we're making
+    # removed space and added -
+    scope = "playlist-modify-public-playlist-modify-private" # The scope request we're making
     state = generate_random_string(16)
-    auth_url = ('https://accounts.spotify.com/authorize?'f'response_type=code&client_id={client_id}&'f'scope={scope}&redirect_uri={redirct_uri}&'f'state={state}')
-    
+    auth_url = (f'https://accounts.spotify.com/authorize?response_type=code&client_id={client_id}&scope={scope}&redirect_uri={redirct_uri}&state={state}')
+
     # Redirects to handle_redirect(), which is the route/link "/redirected"
     return redirect(auth_url)
 
@@ -270,8 +271,8 @@ def refresh_token():
     return None
         
 
-# Created for unique something lmao i forgor         
-def generate_random_string(length):
+# Created for unique string of english alnum characters for the length of the argument
+def generate_random_string(length:int):
     letters = string.ascii_letters + string.digits
     return ''.join(random.choice(letters) for _ in range(length))
     
