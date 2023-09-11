@@ -24,7 +24,7 @@ app.config['SESSION_COOKIE_NAME'] = 'COOKIE'
 def start_login():
     # Establishes scope and client
     # removed space and added -
-    scope = "playlist-modify-public-playlist-modify-private" # The scope request we're making
+    scope = "playlist-modify-public playlist-modify-private" # The scope request we're making
     state = generate_random_string(16)
     auth_url = (f'https://accounts.spotify.com/authorize?response_type=code&client_id={client_id}&scope={scope}&redirect_uri={redirct_uri}&state={state}')
 
