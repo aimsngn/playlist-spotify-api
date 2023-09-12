@@ -14,6 +14,7 @@ To use this application, you need to install the following Python modules using 
 ```bash
 pip install Flask
 pip install Requests
+```
 
 ## Developer Access
 If you'd like developer access to run the app, please send your **Spotify email** and **full name** to be granted access.
