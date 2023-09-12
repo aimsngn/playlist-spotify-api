@@ -9,9 +9,11 @@ This repository is dedicated to experimenting and exploring the functionalities 
     - For experimental features, please create your OWN local branches.
 
 ## Modules Required
-To use this application, you need to download the following modules:
-  - Flask
-  - Request
+To use this application, you need to install the following Python modules using pip:
+
+```bash
+pip install Flask
+pip install Requests
 
 ## Developer Access
 If you'd like developer access to run the app, please send your **Spotify email** and **full name** to be granted access.
